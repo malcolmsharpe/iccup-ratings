@@ -1,0 +1,14 @@
+http://www.iccup.com/starcraft/ladder/1x1/page286.html
+
+# users in Starcraft 14288 (including those that haven't played a game).
+
+Est. total size of uncompressed user pages: 6750MB
+Rough est. total size of uncompressed matchlists (assuming 2 pages per player): 3.5GB
+
+
+Direct access to game details available at
+  http://www.iccup.com/starcraft/details/<gameid>.html
+
+Number of games >100,000.
+
+Est. total size of uncompressed details pages: ~5GB
