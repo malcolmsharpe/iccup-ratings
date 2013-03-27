@@ -2,6 +2,7 @@
 
 from bs4 import BeautifulSoup
 from datetime import datetime
+import time
 import re
 import sys
 import urllib2
@@ -10,11 +11,22 @@ import urllib2
 YEAR = 2013
 
 
+RETRIES = 30
+TIMEOUT = 20
 def urlopen(url):
-  print 'Opening %s ...' % url
-  html = urllib2.urlopen(url).read()
-  print ' ... done.'
-  return html
+  retry = RETRIES
+  while retry > 0:
+    retry -= 1
+    try:
+      print 'Opening %s ...' % url
+      sys.stdout.flush()
+      lines = list( urllib2.urlopen(url, timeout=TIMEOUT) )
+      return lines
+    except:
+      pass
+
+  print 'ERROR: Failed to get URL'
+  return []
 
 
 nick_to_id_cache = {}
@@ -55,7 +67,8 @@ def id_to_match_list(player_id):
     page += 1
 
     url = template % (player_id, page)
-    soup = BeautifulSoup( urlopen(url) )
+    soup = BeautifulSoup( '\n'.join( urlopen(url) ) )
+    print '  ... done parsing.'
     game_tags = soup.find_all('div', 't-corp3')[1:]
 
     if not game_tags:
@@ -69,7 +82,8 @@ def id_to_match_list(player_id):
       winner = ptag_to_nick( player_tags[0] )
       loser = ptag_to_nick( player_tags[1] )
 
-      race_tags = gtag.find_all( 'td', text=re.compile('[PTZ]') )
+      race_tags = gtag.find_all( 'td', text=re.compile('[a-zA-Z]') )
+      assert len(race_tags) == 2
 
       winner_race = race_tags[0].text
       loser_race = race_tags[1].text
@@ -78,7 +92,8 @@ def id_to_match_list(player_id):
 
       map = maptag.text[5:]
       date = datetime.strptime(datetag.text[6:-4] + ' ' + str(YEAR), '%a %b %d %H:%M:%S %Y')
+      timestamp = int( time.mktime( date.timetuple() ) )
 
-      out.append( (game_id, winner, loser, winner_race, loser_race, map, date) )
+      out.append( (game_id, winner, loser, winner_race, loser_race, map, timestamp) )
 
   return out

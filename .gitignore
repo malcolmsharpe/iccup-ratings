@@ -1,2 +1,5 @@
 *.pyc
 trueskill
+*.swp
+*.log
+*.db
