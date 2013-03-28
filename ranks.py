@@ -7,6 +7,8 @@ import re
 import sys
 import urllib2
 
+from name_canon import register_name
+
 
 class URLError(Exception):
   pass
@@ -58,7 +60,10 @@ def nick_to_id(nick):
 
 
 def ptag_to_nick( ptag, pat=re.compile(r'^gamingprofile/(.*)\.html$') ):
-  return pat.match( ptag['href'] ).group(1)
+  nick = pat.match( ptag['href'] ).group(1)
+  if hasattr(ptag, 'text'):
+    register_name(nick, ptag.text)
+  return nick
 assert ptag_to_nick( {'href': 'gamingprofile/username.html'} ) == 'username'
 
 def id_to_match_list(player_id):
@@ -99,5 +104,9 @@ def id_to_match_list(player_id):
       timestamp = int( time.mktime( date.timetuple() ) )
 
       out.append( (game_id, winner, loser, winner_race, loser_race, map, timestamp) )
+
+    # If no next button, it's definitely the last page of games. Saves one request per player.
+    if not soup.find_all('a', text=u'next \xbb'):
+      break
 
   return out

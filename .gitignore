@@ -3,4 +3,5 @@ trueskill
 *.swp
 *.log
 *.db
+*.db-journal
 html/

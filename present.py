@@ -1,4 +1,5 @@
 from Cheetah.Template import Template
+from name_canon import get_name
 from tbl import cursor
 
 t = Template(file='templates/leaderboard.html')
@@ -21,7 +22,10 @@ for (rank, raw_level, nick, mu, sigma, games) in records:
   player.uncertainty = '%.3f' % (3 * sigma)
   player.rank = rank
   player.games = games
-  player.nick = nick
+
+  player.name = get_name(nick)
+  if player.name is None:
+    player.name = nick
 
   player.is_header = prev_level != player.level
   if player.is_header:

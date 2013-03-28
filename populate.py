@@ -59,5 +59,5 @@ while len(queue):
     conn.commit()
 
     print 'Done processing player %s' % current_nick
-  except ranks.URLError:
+  except (ranks.URLError, ValueError):
     print 'ERROR: while processing player %s' % current_nick
