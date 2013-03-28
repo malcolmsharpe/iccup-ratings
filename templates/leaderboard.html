@@ -1,0 +1,28 @@
+<html>
+<head>
+<title>iCCup Leaderboard</title>
+<link rel=stylesheet href="../static/leader.css">
+</head>
+<body>
+<h1>iCCup Leaderboard</h1>
+
+<table>
+<tr><th></th><th>skill range</th><th>rank</th><th>eligible games played</th><th>nickname</th></tr>
+
+#for $player in $players
+
+#if $player.is_header
+<tr class=level><td class=level>Level $player.level</td>
+#elif $player.is_remind
+<tr><td class=lremind>Level $player.level</td>
+#else
+<tr><td></td>
+#end if
+
+<td>$player.mu &plusmn; $player.uncertainty</td><td class=c2>$player.rank</td><td class=c>$player.games</td><td>$player.nick</td></tr>
+
+#end for
+
+</table>
+</body>
+</html>

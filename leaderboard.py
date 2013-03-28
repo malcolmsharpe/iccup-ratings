@@ -1,9 +1,13 @@
 from collections import defaultdict
+import sys
 from tbl import conn, cursor
 import trueskill.trueskill as trueskill
 
 
 def persist_leaderboard(limit=None):
+  print 'Clearing leaderboard table'
+  sys.stdout.flush()
+
   cursor.execute("""
   CREATE TABLE IF NOT EXISTS leaderboard
   (rank integer primary key asc, raw_level real, nick text, mu real, sigma real, games integer)
@@ -12,6 +16,8 @@ def persist_leaderboard(limit=None):
   cursor.execute("""
   DELETE FROM leaderboard
   """)
+
+  conn.commit()
 
   class Player(object):
     def __init__(self):
@@ -22,8 +28,17 @@ def persist_leaderboard(limit=None):
 
   num_iter = 0
   TALK_INCR = 500
+
+  print 'Fetching games'
+  sys.stdout.flush()
+
   query = cursor.execute('select * from games game order by game.id')
-  for (game_id, winner, loser, winner_race, loser_race, map, timestamp) in query.fetchall():
+  records = list( query.fetchall() )
+
+  print 'Applying trueskill to %d games' % len(records)
+  sys.stdout.flush()
+
+  for (game_id, winner, loser, winner_race, loser_race, map, timestamp) in records:
     a = players[winner]
     b = players[loser]
 
@@ -57,3 +72,7 @@ def persist_leaderboard(limit=None):
     rows.append( (rank, p.level, p.name, p.mu, p.sigma, p.games) )
   cursor.executemany('INSERT INTO leaderboard VALUES (?, ?, ?, ?, ?, ?)', rows)
   conn.commit()
+
+
+if __name__ == '__main__':
+  persist_leaderboard()
