@@ -1,4 +1,8 @@
-Workflow:
+How to install:
+  git clone git://github.com/dougz/trueskill.git
+
+
+How to generate a leaderboard from scratch:
   # Create the game table.
   python create_db.py
 
@@ -6,8 +10,8 @@ Workflow:
   # TODO: Can't currently be run from scratch (needs a seed player).
   python populate.py
 
-  # Using the current contents of the game database (possibly incomplete), generate the leaderboard
-  # table in the database.
+  # Using the current contents of the game table (possibly incomplete), generate the leaderboard
+  # table in the database. Clears the old table, if any.
   python leaderboard.py
 
   # Generate a pretty HTML leaderboard at "html/leaderboard.html".
