@@ -1,13 +1,12 @@
 import argparse
 from collections import deque
 import ranks
+import re
 import sys
 from tbl import conn, cursor
 
-mark = set( line.strip() for line in file('completed.txt') )
-for player in mark:
-  print 'Skipping player %s' % player
 
+mark = set()
 queue = deque()
 
 def enqueue(nick):
@@ -19,8 +18,25 @@ def enqueue(nick):
   queue.append(nick)
 
 
-for nick in file('enqueue.txt'):
-  enqueue( nick.strip() )
+def restart(log_path):
+  print 'Restarting from previous log %s' % log_path
+  skip_pat = re.compile(r'(?:Skipping player|Done processing player) (.*)$')
+  enq_pat = re.compile(r'Enqueuing player (.*)$')
+  to_enqueue = []
+  for line in file(log_path):
+    m = skip_pat.match(line)
+    if m:
+      print 'Skipping player %s' % m.group(1).strip()
+      mark.add( m.group(1) )
+    m = enq_pat.match(line)
+    if m:
+      to_enqueue.append( m.group(1).strip() )
+  for nick in to_enqueue:
+    enqueue(nick)
+  print 'Done restart'
+
+if len(sys.argv) > 1:
+  restart( sys.argv[1] )
 
 
 while len(queue):
