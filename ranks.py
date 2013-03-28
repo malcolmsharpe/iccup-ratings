@@ -8,6 +8,10 @@ import sys
 import urllib2
 
 
+class URLError(Exception):
+  pass
+
+
 YEAR = 2013
 
 
@@ -22,11 +26,11 @@ def urlopen(url):
       sys.stdout.flush()
       lines = list( urllib2.urlopen(url, timeout=TIMEOUT) )
       return lines
-    except:
+    except Exception:
       pass
 
   print 'ERROR: Failed to get URL'
-  return []
+  raise URLError()
 
 
 nick_to_id_cache = {}
