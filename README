@@ -1,0 +1,14 @@
+Workflow:
+  # Create the game table.
+  python create_db.py
+
+  # Populate the game table by crawling iCCup website. Takes a very long time.
+  # TODO: Can't currently be run from scratch (needs a seed player).
+  python populate.py
+
+  # Using the current contents of the game database (possibly incomplete), generate the leaderboard
+  # table in the database.
+  python leaderboard.py
+
+  # Generate a pretty HTML leaderboard at "html/leaderboard.html".
+  python present.py
