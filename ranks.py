@@ -5,58 +5,12 @@ from datetime import datetime
 import time
 import re
 import sys
-import urllib2
 
 from name_canon import register_name
-
-
-class URLError(Exception):
-  pass
+from iccup import urlopen
 
 
 YEAR = 2013
-
-
-RETRIES = 30
-TIMEOUT = 20
-def urlopen(url):
-  retry = RETRIES
-  while retry > 0:
-    retry -= 1
-    try:
-      print 'Opening %s ...' % url
-      sys.stdout.flush()
-      lines = list( urllib2.urlopen(url, timeout=TIMEOUT) )
-      return lines
-    except Exception:
-      pass
-
-  print 'ERROR: Failed to get URL'
-  raise URLError()
-
-
-nick_to_id_cache = {}
-
-def nick_to_id(nick):
-  if nick not in nick_to_id_cache:
-    template = 'http://www.iccup.com/starcraft/gamingprofile/%s.html'
-    url = template % nick
-    pat = re.compile(r'matchlist/([0-9]*)/1x1.html')
-
-    for line in urlopen(url):
-      m = pat.search(line)
-      if m:
-        id = int( m.group(1) )
-        break
-    else:
-      id = None
-
-    nick_to_id_cache[nick] = id
-
-  id = nick_to_id_cache[nick]
-  if id is not None:
-    return id
-  raise ValueError('Invalid nick: ' + nick)
 
 
 def ptag_to_nick( ptag, pat=re.compile(r'^gamingprofile/(.*)\.html$') ):

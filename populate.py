@@ -1,9 +1,12 @@
 import argparse
 from collections import deque
-import ranks
 import re
 import sys
+
+from player import nick_to_id 
+import ranks
 from tbl import conn, cursor
+import iccup
 
 
 mark = set()
@@ -46,7 +49,7 @@ while len(queue):
   sys.stdout.flush()
 
   try:
-    current_id = ranks.nick_to_id(current_nick)
+    current_id = nick_to_id(current_nick)
     print 'ID = %s' % current_id
 
     matches = ranks.id_to_match_list(current_id)
@@ -59,5 +62,5 @@ while len(queue):
     conn.commit()
 
     print 'Done processing player %s' % current_nick
-  except (ranks.URLError, ValueError):
+  except (iccup.URLError, ValueError):
     print 'ERROR: while processing player %s' % current_nick
