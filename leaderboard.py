@@ -1,3 +1,4 @@
+import argparse
 from collections import defaultdict
 import sys
 from tbl import conn, cursor
@@ -75,4 +76,13 @@ def persist_leaderboard(limit=None):
 
 
 if __name__ == '__main__':
+  parser = argparse.ArgumentParser()
+  parser.add_argument('--beta', type=float,
+    help='beta parameter to trueskill (default %.3f)' % trueskill.BETA)
+  parser.add_argument('--gamma', type=float,
+    help='gamma parameter to trueskill (default %.3f)' % trueskill.GAMMA)
+  args = parser.parse_args()
+
+  trueskill.SetParameters(beta=args.beta, draw_probability=0.0, gamma=args.gamma)
+
   persist_leaderboard()

@@ -23,6 +23,7 @@ for (rank, raw_level, nick, mu, sigma, games) in records:
   player.rank = rank
   player.games = games
 
+  player.nick = nick
   player.name = get_name(nick)
   if player.name is None:
     player.name = nick
