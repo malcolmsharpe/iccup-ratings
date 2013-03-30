@@ -30,8 +30,8 @@ def urlopen(url):
 
       print 'Opening %s ...' % url
       sys.stdout.flush()
-      lines = list( urllib2.urlopen(url, timeout=TIMEOUT) )
       last_crawl = time.time()
+      lines = list( urllib2.urlopen(url, timeout=TIMEOUT) )
       return lines
     except Exception:
       pass
