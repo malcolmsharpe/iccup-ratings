@@ -1,4 +1,6 @@
 from Cheetah.Template import Template
+
+import letter
 from name_canon import get_name
 from tbl import cursor
 
@@ -10,7 +12,8 @@ class Player(object):
   pass
 
 query = cursor.execute('select * from leaderboard rec order by rec.rank')
-records = list( query.fetchall() )
+records = query.fetchall()
+letter_dict = letter.get_dict()
 players = []
 prev_level = None
 run = 0
@@ -27,6 +30,8 @@ for (rank, raw_level, nick, mu, sigma, games) in records:
   player.name = get_name(nick)
   if player.name is None:
     player.name = nick
+
+  player.iccup_class, player.iccup_letter = letter_dict.get( nick, ('', '') )
 
   player.is_header = prev_level != player.level
   if player.is_header:

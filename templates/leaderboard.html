@@ -10,7 +10,9 @@ Layout from isotropic Innovation leaderboard</a>
 
 <p>
 <table>
-<tr><th></th><th>skill range</th><th>rank</th><th>eligible games played</th><th>nickname</th></tr>
+<tr><th></th><th>skill range</th><th>rank</th><th>eligible games played</th><th>nickname</th>
+<th>iCCup ranking</th>
+</tr>
 
 #for $player in $players
 
@@ -22,7 +24,11 @@ Layout from isotropic Innovation leaderboard</a>
 <tr><td></td>
 #end if
 
-<td>$player.mu &plusmn; $player.uncertainty</td><td class=c2>$player.rank</td><td class=c>$player.games</td><td><a href="http://www.iccup.com/starcraft/gamingprofile/${player.nick}.html">$player.name</a></td></tr>
+<td>$player.mu &plusmn; $player.uncertainty</td><td class=c2>$player.rank</td>
+<td class=c>$player.games</td>
+<td><a href="http://www.iccup.com/starcraft/gamingprofile/${player.nick}.html">$player.name</a></td>
+<td class=$player.iccup_class>$player.iccup_letter</td>
+</tr>
 
 #end for
 

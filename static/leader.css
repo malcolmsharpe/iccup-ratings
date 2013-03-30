@@ -16,3 +16,8 @@ b { font-weight: bold; color: #000; }
 .stats td { font-weight: bold; text-align: right }
 .stats th.b { border-bottom: 1px solid #ccf; }
 .stats th.r { border-right: 1px solid #ccf; }
+
+.rankd { color: red; font-weight: bold }
+.rankc { color: yellow; font-weight: bold; text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black}
+.rankb { color: blue; font-weight: bold }
+.ranka { color: #00FF00; font-weight: bold; text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black }
