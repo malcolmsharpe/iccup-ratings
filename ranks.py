@@ -20,7 +20,8 @@ def ptag_to_nick( ptag, pat=re.compile(r'^gamingprofile/(.*)\.html$') ):
   return nick
 assert ptag_to_nick( {'href': 'gamingprofile/username.html'} ) == 'username'
 
-def id_to_match_list(player_id):
+BIG = 1000000000
+def id_to_match_list(player_id, known_max_game_id):
   template = 'http://www.iccup.com/starcraft/matchlist/%s/1x1/page%s.html'
 
   out = []
@@ -37,6 +38,7 @@ def id_to_match_list(player_id):
     if not game_tags:
       break
 
+    min_game_id = BIG
     for gtag in game_tags:
       player_tags = gtag.find_all( 'a', href=re.compile('gamingprofile') )[2:]
 
@@ -58,9 +60,16 @@ def id_to_match_list(player_id):
       timestamp = int( time.mktime( date.timetuple() ) )
 
       out.append( (game_id, winner, loser, winner_race, loser_race, map, timestamp) )
+      min_game_id = min(min_game_id, game_id)
 
     # If no next button, it's definitely the last page of games. Saves one request per player.
     if not soup.find_all('a', text=u'next \xbb'):
+      break
+
+    # If we're discovering games from this player that we already knew, abort.
+    if min_game_id <= known_max_game_id:
+      print 'Breaking early from match list: game id %d less than known max %d' % (
+        min_game_id, known_max_game_id)
       break
 
   return out
