@@ -34,7 +34,7 @@ def persist_leaderboard(limit=None):
   sys.stdout.flush()
 
   query = cursor.execute('select * from games game order by game.id')
-  records = list( query.fetchall() )
+  records = query.fetchall()
 
   print 'Applying trueskill to %d games' % len(records)
   sys.stdout.flush()
