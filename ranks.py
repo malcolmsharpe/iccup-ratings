@@ -6,8 +6,9 @@ import time
 import re
 import sys
 
-from name_canon import register_name
 from iccup import urlopen
+import letter
+from name_canon import register_name
 
 
 YEAR = 2013
@@ -26,6 +27,7 @@ def id_to_match_list(player_id, known_max_game_id):
 
   out = []
 
+  noted_letter = False
   page = 0
   while 1:
     page += 1
@@ -61,6 +63,17 @@ def id_to_match_list(player_id, known_max_game_id):
 
       out.append( (game_id, winner, loser, winner_race, loser_race, map, timestamp) )
       min_game_id = min(min_game_id, game_id)
+
+      if not noted_letter:
+        rank_divs = gtag.find_all( 'div', title=re.compile(r'[0-9]+') )
+        if len(rank_divs) == 2:
+          for rdiv, ptag in zip(rank_divs, player_tags):
+            if 'bold' in ptag.get( 'style', [] ):
+              letter.note( ptag_to_nick(ptag), rdiv['class'][0] )
+              noted_letter = True
+              break
+        else:
+          print 'WARNING: For player %s, strange number of rank divs'
 
     # If no next button, it's definitely the last page of games. Saves one request per player.
     if not soup.find_all('a', text=u'next \xbb'):

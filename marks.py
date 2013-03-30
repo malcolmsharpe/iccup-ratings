@@ -53,7 +53,7 @@ def choose_player(banned):
   for nick in players:
     score = player_post[nick]
     if player_mark[nick] > 0:
-      score += ( max_mark - player_mark[nick] ) * player_pre[nick] / player_mark[nick]
+      score += ( max_mark - player_mark[nick] ) * player_pre[nick] / float( player_mark[nick] )
     score_player.append( (score, nick) )
 
   score, nick = max(score_player)
