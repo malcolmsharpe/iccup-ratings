@@ -28,7 +28,7 @@ def query(nick):
     return 0
 
 
-def choose_player():
+def choose_player(banned):
   player_mark = defaultdict(lambda: 0)
 
   cursor.execute('SELECT nick, game_id FROM mark')
@@ -49,6 +49,7 @@ def choose_player():
   max_mark = max( player_mark.values() )
   score_player = []
   players = set( player_mark.keys() + player_pre.keys() + player_post.keys() )
+  players -= set(banned)
   for nick in players:
     score = player_post[nick]
     if player_mark[nick] > 0:

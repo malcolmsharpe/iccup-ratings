@@ -9,8 +9,11 @@ import ranks
 from tbl import conn, cursor
 
 
+errs = set()
+
+
 while 1:
-  current_nick = marks.choose_player()
+  current_nick = marks.choose_player(errs)
 
   print 'Processing player %s' % current_nick
   sys.stdout.flush()
@@ -29,3 +32,4 @@ while 1:
     print 'Done processing player %s' % current_nick
   except (iccup.URLError, ValueError):
     print 'ERROR: while processing player %s' % current_nick
+    errs.add(current_nick)
