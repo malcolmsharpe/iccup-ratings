@@ -7,4 +7,4 @@ cp html/leaderboard.html ../www/html/leaderboard.html
 cp html/games.json ../www/games.json
 cd ../www
 git commit -a -m 'Publish latest data.'
-git push origin master
+git push origin gh-pages

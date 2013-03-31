@@ -23,7 +23,7 @@ def query(nick):
   cursor.execute( 'SELECT nick, game_id FROM mark WHERE nick = ?', [nick] )
   res = cursor.fetchall()
   if res:
-    return res[1]
+    return res[0][1]
   else:
     return 0
 
@@ -58,7 +58,7 @@ def choose_player(banned):
 
   score, nick = max(score_player)
 
-  print 'Player %s:  pre = %d, post = %d, mark = %d, max_mark = %d' % (
-    nick, player_pre[nick], player_post[nick], player_mark[nick], max_mark)
+  print 'Player %s:  pre = %d, post = %d, mark = %d, max_mark = %d, score = %.1f' % (
+    nick, player_pre[nick], player_post[nick], player_mark[nick], max_mark, score)
 
   return nick
