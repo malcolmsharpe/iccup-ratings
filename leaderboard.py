@@ -3,8 +3,12 @@ from collections import defaultdict
 import sys
 
 import marks
+from starcraft import matchups
 from tbl import conn, cursor
 import trueskill.trueskill as trueskill
+
+
+COLUMNS = 8 + len(matchups)
 
 
 def persist_leaderboard(limit):
@@ -18,8 +22,9 @@ def persist_leaderboard(limit):
   cursor.execute("""
   CREATE TABLE leaderboard
   (rank integer primary key asc, raw_level real, nick text, mu real, sigma real, wins integer,
-  losses integer, timestamp integer)
-  """)
+  losses integer, timestamp integer, """
+  + ', '.join('%s integer' % mup for mup in matchups)
+  + """)""")
 
   cursor.execute("""
   DELETE FROM leaderboard
@@ -32,6 +37,8 @@ def persist_leaderboard(limit):
       self.skill = (trueskill.INITIAL_MU, trueskill.INITIAL_SIGMA)
       self.wins = 0
       self.losses = 0
+
+      self.matchups = defaultdict(lambda: 0)
 
   players = defaultdict( lambda: Player() )
 
@@ -59,6 +66,10 @@ def persist_leaderboard(limit):
 
     a.wins += 1
     b.losses += 1
+
+    mup = (winner_race + 'v' + loser_race).lower()
+    a.matchups[mup] += 1
+    b.matchups[ mup[::-1] ] += 1
 
     a.rank = 1
     b.rank = 2
@@ -88,8 +99,10 @@ def persist_leaderboard(limit):
   rows = []
   for i, p in enumerate(player_list):
     rank = i + 1
-    rows.append( (rank, p.level, p.nick, p.mu, p.sigma, p.wins, p.losses, p.timestamp) )
-  cursor.executemany('INSERT INTO leaderboard VALUES (?, ?, ?, ?, ?, ?, ?, ?)', rows)
+    row = (rank, p.level, p.nick, p.mu, p.sigma, p.wins, p.losses, p.timestamp)
+    row += tuple(p.matchups[mup] for mup in matchups)
+    rows.append(row)
+  cursor.executemany('INSERT INTO leaderboard VALUES (%s)' % ', '.join('?' * COLUMNS), rows)
   conn.commit()
 
 

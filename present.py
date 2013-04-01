@@ -3,6 +3,7 @@ import datetime
 
 import letter
 from name_canon import get_name
+from starcraft import guess_race, matchups
 from tbl import cursor
 
 t = Template(file='templates/leaderboard.html')
@@ -10,13 +11,19 @@ t = Template(file='templates/leaderboard.html')
 class Player(object):
   pass
 
+
+BASIC_COLUMNS = 8
+
+
 query = cursor.execute('select * from leaderboard rec order by rec.rank')
 records = query.fetchall()
 letter_dict = letter.get_dict()
 players = []
 prev_level = None
 run = 0
-for (rank, raw_level, nick, mu, sigma, wins, losses, timestamp) in records:
+for rec in records:
+  rank, raw_level, nick, mu, sigma, wins, losses, timestamp = rec[:BASIC_COLUMNS]
+  mup_counts = rec[BASIC_COLUMNS:]
   player = Player()
 
   player.level = int( max(raw_level, 0) )
@@ -26,6 +33,7 @@ for (rank, raw_level, nick, mu, sigma, wins, losses, timestamp) in records:
   player.games = wins + losses
   player.wins = wins
   player.losses = losses
+  player.race = guess_race(mup_counts)
   if timestamp is not None:
     dt = datetime.datetime.fromtimestamp(timestamp)
     # Convert from MSK to PDT.
