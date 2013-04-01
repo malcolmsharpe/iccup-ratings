@@ -11,7 +11,7 @@ Layout from isotropic Innovation leaderboard</a>
 <p>
 <table>
 <tr><th></th><th>skill range</th><th>rank</th><th>eligible games played</th><th>nickname</th>
-<th>iCCup ranking</th><th>win-loss record</th>
+<th>iCCup ranking</th><th>win-loss record</th><th>last crawl</th>
 </tr>
 
 #for $player in $players
@@ -29,6 +29,7 @@ Layout from isotropic Innovation leaderboard</a>
 <td><a href="http://www.iccup.com/starcraft/gamingprofile/${player.nick}.html">$player.name</a></td>
 <td class=$player.iccup_class>$player.iccup_letter</td>
 <td>$player.wins-$player.losses</td>
+<td>$player.last_crawl</td>
 </tr>
 
 #end for

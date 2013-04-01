@@ -1,6 +1,8 @@
 import argparse
 from collections import defaultdict
 import sys
+
+import marks
 from tbl import conn, cursor
 import trueskill.trueskill as trueskill
 
@@ -16,7 +18,7 @@ def persist_leaderboard(limit):
   cursor.execute("""
   CREATE TABLE leaderboard
   (rank integer primary key asc, raw_level real, nick text, mu real, sigma real, wins integer,
-  losses integer)
+  losses integer, timestamp integer)
   """)
 
   cursor.execute("""
@@ -36,6 +38,9 @@ def persist_leaderboard(limit):
   num_iter = 0
   TALK_INCR = 500
 
+  print 'Fetching marks'
+  player_mark = marks.get_player_mark()
+
   print 'Fetching games'
   sys.stdout.flush()
 
@@ -45,6 +50,8 @@ def persist_leaderboard(limit):
   print 'Applying trueskill to %d games' % len(records)
   sys.stdout.flush()
 
+  game_timestamp = {}
+  last_game_id = 0
   for (game_id, winner, loser, winner_race, loser_race, map, timestamp) in records:
     a = players[winner]
     b = players[loser]
@@ -61,23 +68,27 @@ def persist_leaderboard(limit):
     if num_iter % TALK_INCR == 0:
       print 'Processed game %6d (id = %6d): %s vs %s' % (num_iter, int(game_id), winner, loser)
 
+    game_timestamp[game_id] = timestamp
+    last_game_id = game_id
+
     if limit is not None and num_iter >= limit:
       break
 
   player_list = []
-  for name, p in players.items():
-    p.name = name
+  for nick, p in players.items():
+    p.nick = nick
     player_list.append(p)
     p.mu, p.sigma = p.skill
     p.level = p.mu - p.sigma * 3.0
+    p.timestamp = game_timestamp.get( min( last_game_id, player_mark[nick] ) )
   player_list.sort(key=lambda p: p.level)
   player_list.reverse()
 
   rows = []
   for i, p in enumerate(player_list):
     rank = i + 1
-    rows.append( (rank, p.level, p.name, p.mu, p.sigma, p.wins, p.losses) )
-  cursor.executemany('INSERT INTO leaderboard VALUES (?, ?, ?, ?, ?, ?, ?)', rows)
+    rows.append( (rank, p.level, p.nick, p.mu, p.sigma, p.wins, p.losses, p.timestamp) )
+  cursor.executemany('INSERT INTO leaderboard VALUES (?, ?, ?, ?, ?, ?, ?, ?)', rows)
   conn.commit()
 
 

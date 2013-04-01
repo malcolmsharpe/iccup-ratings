@@ -28,12 +28,18 @@ def query(nick):
     return 0
 
 
-def choose_player(banned):
+def get_player_mark():
   player_mark = defaultdict(lambda: 0)
 
   cursor.execute('SELECT nick, game_id FROM mark')
   for nick, game_id in cursor.fetchall():
     player_mark[nick] = game_id
+
+  return player_mark
+
+
+def choose_player(banned):
+  player_mark = get_player_mark()
 
   player_pre = defaultdict(lambda: 0)
   player_post = defaultdict(lambda: 0)

@@ -1,4 +1,5 @@
 from Cheetah.Template import Template
+import datetime
 
 import letter
 from name_canon import get_name
@@ -15,7 +16,7 @@ letter_dict = letter.get_dict()
 players = []
 prev_level = None
 run = 0
-for (rank, raw_level, nick, mu, sigma, wins, losses) in records:
+for (rank, raw_level, nick, mu, sigma, wins, losses, timestamp) in records:
   player = Player()
 
   player.level = int( max(raw_level, 0) )
@@ -25,6 +26,13 @@ for (rank, raw_level, nick, mu, sigma, wins, losses) in records:
   player.games = wins + losses
   player.wins = wins
   player.losses = losses
+  if timestamp is not None:
+    dt = datetime.datetime.fromtimestamp(timestamp)
+    # Convert from MSK to PDT.
+    dt = dt - datetime.timedelta(hours=11)
+    player.last_crawl = dt.strftime('%a %b %d %H:%M PDT')
+  else:
+    player.last_crawl = 'unknown'
 
   player.nick = nick
   player.name = get_name(nick)
