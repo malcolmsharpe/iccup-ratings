@@ -24,12 +24,14 @@ while 1:
 
     matches = ranks.id_to_match_list( current_id, marks.query(current_nick) )
 
-    cursor.executemany('INSERT OR IGNORE INTO games VALUES (?, ?, ?, ?, ?, ?, ?)', matches)
+    cursor.executemany('INSERT OR REPLACE INTO games VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+      matches)
     conn.commit()
 
     marks.affirm(current_nick)
 
     print 'Done processing player %s' % current_nick
-  except (iccup.URLError, ValueError):
+  except (iccup.URLError, ValueError), e:
     print 'ERROR: while processing player %s' % current_nick
+    print '  description = %s' % e
     errs.add(current_nick)

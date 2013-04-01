@@ -44,7 +44,7 @@ def persist_leaderboard(limit):
   print 'Fetching games'
   sys.stdout.flush()
 
-  query = cursor.execute('select * from games game order by game.id')
+  query = cursor.execute('SELECT * FROM games game ORDER BY game.id')
   records = query.fetchall()
 
   print 'Applying trueskill to %d games' % len(records)
@@ -52,7 +52,8 @@ def persist_leaderboard(limit):
 
   game_timestamp = {}
   last_game_id = 0
-  for (game_id, winner, loser, winner_race, loser_race, map, timestamp) in records:
+  for (game_id, winner, loser, winner_race, loser_race, map, timestamp, winner_rating,
+    loser_rating, duration) in records:
     a = players[winner]
     b = players[loser]
 
