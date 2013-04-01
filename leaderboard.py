@@ -5,13 +5,18 @@ from tbl import conn, cursor
 import trueskill.trueskill as trueskill
 
 
-def persist_leaderboard(limit=None):
+def persist_leaderboard(limit):
   print 'Clearing leaderboard table'
   sys.stdout.flush()
 
   cursor.execute("""
-  CREATE TABLE IF NOT EXISTS leaderboard
-  (rank integer primary key asc, raw_level real, nick text, mu real, sigma real, games integer)
+  DROP TABLE IF EXISTS leaderboard
+  """)
+
+  cursor.execute("""
+  CREATE TABLE leaderboard
+  (rank integer primary key asc, raw_level real, nick text, mu real, sigma real, wins integer,
+  losses integer)
   """)
 
   cursor.execute("""
@@ -23,7 +28,8 @@ def persist_leaderboard(limit=None):
   class Player(object):
     def __init__(self):
       self.skill = (trueskill.INITIAL_MU, trueskill.INITIAL_SIGMA)
-      self.games = 0
+      self.wins = 0
+      self.losses = 0
 
   players = defaultdict( lambda: Player() )
 
@@ -43,8 +49,8 @@ def persist_leaderboard(limit=None):
     a = players[winner]
     b = players[loser]
 
-    a.games += 1
-    b.games += 1
+    a.wins += 1
+    b.losses += 1
 
     a.rank = 1
     b.rank = 2
@@ -70,13 +76,15 @@ def persist_leaderboard(limit=None):
   rows = []
   for i, p in enumerate(player_list):
     rank = i + 1
-    rows.append( (rank, p.level, p.name, p.mu, p.sigma, p.games) )
-  cursor.executemany('INSERT INTO leaderboard VALUES (?, ?, ?, ?, ?, ?)', rows)
+    rows.append( (rank, p.level, p.name, p.mu, p.sigma, p.wins, p.losses) )
+  cursor.executemany('INSERT INTO leaderboard VALUES (?, ?, ?, ?, ?, ?, ?)', rows)
   conn.commit()
 
 
 if __name__ == '__main__':
   parser = argparse.ArgumentParser()
+  parser.add_argument('--limit', type=int,
+    help='limit the number of games to process')
   parser.add_argument('--beta', type=float,
     help='beta parameter to trueskill (default %.3f)' % trueskill.BETA)
   parser.add_argument('--gamma', type=float,
@@ -85,4 +93,4 @@ if __name__ == '__main__':
 
   trueskill.SetParameters(beta=args.beta, draw_probability=0.0, gamma=args.gamma)
 
-  persist_leaderboard()
+  persist_leaderboard(args.limit)

@@ -6,8 +6,6 @@ from tbl import cursor
 
 t = Template(file='templates/leaderboard.html')
 
-TEXT_OUTPUT = False
-
 class Player(object):
   pass
 
@@ -17,14 +15,16 @@ letter_dict = letter.get_dict()
 players = []
 prev_level = None
 run = 0
-for (rank, raw_level, nick, mu, sigma, games) in records:
+for (rank, raw_level, nick, mu, sigma, wins, losses) in records:
   player = Player()
 
   player.level = int( max(raw_level, 0) )
   player.mu = '%.3f' % mu
   player.uncertainty = '%.3f' % (3 * sigma)
   player.rank = rank
-  player.games = games
+  player.games = wins + losses
+  player.wins = wins
+  player.losses = losses
 
   player.nick = nick
   player.name = get_name(nick)
@@ -41,14 +41,6 @@ for (rank, raw_level, nick, mu, sigma, games) in records:
   prev_level = player.level
   run += 1
   players.append(player)
-
-
-if TEXT_OUTPUT:
-  f = file('html/leaderboard.txt', 'w')
-  print >>f, '=== Leaderboard ==='
-  for player in players:
-    print >>f, '%02d  %6s +/- %6s  %4d  %3d   %s' % (player.level, player.mu, player.uncertainty,
-      player.rank, player.games, player.nick)
 
 
 t.players = players
