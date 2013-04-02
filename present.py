@@ -15,12 +15,24 @@ class Player(object):
 BASIC_COLUMNS = 8
 
 
+def format_timestamp(timestamp):
+  if timestamp is not None:
+    dt = datetime.datetime.fromtimestamp(timestamp)
+    # Convert from MSD to PDT.
+    # Unfortunately some timestamps are in MSK and some in MSD.
+    dt = dt - datetime.timedelta(hours=12)
+    return dt.strftime('%a %b %d %H:%M PDT')
+  else:
+    return 'unknown'
+
+
 query = cursor.execute('select * from leaderboard rec order by rec.rank')
 records = query.fetchall()
 letter_dict = letter.get_dict()
 players = []
 prev_level = None
 run = 0
+max_timestamp = 0
 for rec in records:
   rank, raw_level, nick, mu, sigma, wins, losses, timestamp = rec[:BASIC_COLUMNS]
   mup_counts = rec[BASIC_COLUMNS:]
@@ -34,13 +46,7 @@ for rec in records:
   player.wins = wins
   player.losses = losses
   player.race = guess_race(mup_counts)
-  if timestamp is not None:
-    dt = datetime.datetime.fromtimestamp(timestamp)
-    # Convert from MSK to PDT.
-    dt = dt - datetime.timedelta(hours=11)
-    player.last_crawl = dt.strftime('%a %b %d %H:%M PDT')
-  else:
-    player.last_crawl = 'unknown'
+  player.last_crawl = format_timestamp(timestamp)
 
   player.nick = nick
   player.name = get_name(nick)
@@ -56,9 +62,11 @@ for rec in records:
 
   prev_level = player.level
   run += 1
+  max_timestamp = max(max_timestamp, timestamp)
   players.append(player)
 
 
+t.last_crawl = format_timestamp(max_timestamp)
 t.players = players
 
 print >>file('html/leaderboard.html', 'w'), t
