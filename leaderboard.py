@@ -61,6 +61,10 @@ def persist_leaderboard(limit):
   last_game_id = 0
   for (game_id, winner, loser, winner_race, loser_race, map, timestamp, winner_rating,
     loser_rating, duration) in records:
+    if winner == loser:
+      print 'WARNING: game id %d has same winner and loser %s' % (game_id, winner)
+      continue
+
     a = players[winner]
     b = players[loser]
 
