@@ -12,6 +12,11 @@ CREATE TABLE IF NOT EXISTS mark
 conn.commit()
 
 
+def reset(nick):
+  cursor.execute( 'DELETE FROM mark WHERE nick = ?', [nick] )
+  conn.commit()
+
+
 def affirm(nick):
   game_id = cursor.execute('SELECT MAX(id) FROM games').fetchall()[0][0]
   print 'Affirming player %s mark at %d' % (nick, game_id)
