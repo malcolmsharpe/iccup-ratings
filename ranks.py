@@ -23,6 +23,7 @@ assert ptag_to_nick( {'href': 'gamingprofile/username.html'} ) == 'username'
 
 BIG = 1000000000
 dur_pat = re.compile(r'([0-9]+) : ([0-9]+)')
+diff_pat = re.compile(r'^[+-][0-9]+$')
 def id_to_match_list(player_id, known_max_game_id):
   template = 'http://www.iccup.com/starcraft/matchlist/%s/1x1/page%s.html'
 
@@ -65,23 +66,31 @@ def id_to_match_list(player_id, known_max_game_id):
       rank_divs = gtag.find_all( 'div', title=re.compile(r'[0-9]+') )
       if len(rank_divs) == 2:
         letters = []
+        precises = []
 
         for rdiv, ptag in zip(rank_divs, player_tags):
           lett = rdiv['class'][0]
+          try:
+            prec = int( rdiv['title'] )
+          except ValueError:
+            prec = None
           letters.append(lett)
+          precises.append(prec)
           if not noted_letter and 'bold' in ptag.get( 'style', [] ):
             letter.note(ptag_to_nick(ptag), lett)
             noted_letter = True
         assert len(letters) == 2
+        assert len(precises) == 2
 
         winner_letter, loser_letter = letters
+        winner_precise, loser_precise = precises
       else:
-        print "WARNING: strange number of rank divs"
+        print 'WARNING: game %d has strange number of rank divs' % game_id
 
       duration = None
       dtag = gtag.find('div', 'field8 width60')
       if dtag is None:
-        print 'WARNING: game has no duration'
+        print 'WARNING: game %d has no duration' % game_id
       else:
         bold_tag = dtag.find('b')
 
@@ -92,12 +101,19 @@ def id_to_match_list(player_id, known_max_game_id):
 
         m = dur_pat.match(dur_str)
         if m is None:
-          print 'WARNING: game has weird duration'
+          print 'WARNING: game %d has weird duration' % game_id
         else:
           duration = 60 * int( m.group(1) ) + int( m.group(2) )
 
+      winner_diff = None
+      ftag = gtag.find('b', text=diff_pat)
+      if ftag is None:
+        print 'WARNING: game %d has no winner diff' % game_id
+      else:
+        winner_diff = int(ftag.text)
+
       out.append( (game_id, winner, loser, winner_race, loser_race, map, timestamp, winner_letter,
-        loser_letter, duration) )
+        loser_letter, duration, winner_precise, loser_precise, winner_diff) )
       min_game_id = min(min_game_id, game_id)
 
     # If no next button, it's definitely the last page of games. Saves one request per player.

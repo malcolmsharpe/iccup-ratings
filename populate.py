@@ -24,7 +24,8 @@ while 1:
 
     matches = ranks.id_to_match_list( current_id, marks.query(current_nick) )
 
-    cursor.executemany('INSERT OR REPLACE INTO games VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+    cursor.executemany(
+      'INSERT OR REPLACE INTO games VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
       matches)
     conn.commit()
 

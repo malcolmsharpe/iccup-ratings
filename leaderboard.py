@@ -51,7 +51,8 @@ def persist_leaderboard(limit):
   print 'Fetching games'
   sys.stdout.flush()
 
-  query = cursor.execute('SELECT * FROM games game ORDER BY game.id')
+  query = cursor.execute(
+    'SELECT id, winner, loser, winner_race, loser_race, timestamp FROM games ORDER BY id')
   records = query.fetchall()
 
   print 'Applying trueskill to %d games' % len(records)
@@ -59,8 +60,7 @@ def persist_leaderboard(limit):
 
   game_timestamp = {}
   last_game_id = 0
-  for (game_id, winner, loser, winner_race, loser_race, map, timestamp, winner_rating,
-    loser_rating, duration) in records:
+  for (game_id, winner, loser, winner_race, loser_race, timestamp) in records:
     if winner == loser:
       print 'WARNING: game id %d has same winner and loser %s' % (game_id, winner)
       continue

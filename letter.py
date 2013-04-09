@@ -1,5 +1,6 @@
 from tbl import conn, cursor
 
+# This table DEPRECATED. Player rankings are now stored in the games table.
 cursor.execute("""
 CREATE TABLE IF NOT EXISTS letter 
 (nick text primary key, letter text)
@@ -47,8 +48,11 @@ letter_to_pretty = {
 
 def get_dict():
   out = {}
+
+  # First use the old letter database.
   for nick, letter in cursor.execute('SELECT * FROM letter').fetchall():
     iccup_class = letter_to_class[letter]
     iccup_letter = letter_to_pretty[letter]
     out[nick] = (iccup_class, iccup_letter)
+
   return out
