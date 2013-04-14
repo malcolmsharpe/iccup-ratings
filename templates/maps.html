@@ -1,0 +1,26 @@
+<html>
+<head>
+<title>iCCup Map Stats</title>
+</head>
+<body>
+<h1>iCCup Map Stats</h1>
+<p>Last updated at $last_crawl.</p>
+
+#for $map in $maps
+
+<h2>$map.name</h2>
+
+<p>Total games: $map.games
+
+<p>
+<table>
+<tr><th>Race</th><th>Wins</th><th></th><th>Wins</th><th>Race</th><th>%</th></tr>
+#for $mup in $map.mups
+<tr><td>$mup.r1</td><td>$mup.wins</td><td>&mdash;</td><td>$mup.losses</td><td>$mup.r2</td><td>$mup.pct</td></tr>
+#end for
+</table>
+
+#end for
+
+</body>
+</html>

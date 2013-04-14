@@ -2,6 +2,10 @@ from collections import Counter, defaultdict
 
 races = 'ptz'
 matchups = ['%sv%s' % (r1, r2) for r1 in races for r2 in races]
+unordered_matchups = ['tvz', 'zvp', 'pvt']
+
+def make_matchup(a, b):
+  return (a + 'v' + b).lower()
 
 def guess_race(mup_counts):
   oppose = defaultdict(lambda: defaultdict(lambda: 0) )

@@ -1,10 +1,10 @@
 from Cheetah.Template import Template
-import datetime
 
 import letter
 from name_canon import get_name
 from starcraft import guess_race, matchups
 from tbl import cursor
+from timeutil import format_timestamp
 
 t = Template(file='templates/leaderboard.html')
 
@@ -13,17 +13,6 @@ class Player(object):
 
 
 BASIC_COLUMNS = 8
-
-
-def format_timestamp(timestamp):
-  if timestamp is not None:
-    dt = datetime.datetime.fromtimestamp(timestamp)
-    # Convert from MSD to PDT.
-    # Unfortunately some timestamps are in MSK and some in MSD.
-    dt = dt - datetime.timedelta(hours=12)
-    return dt.strftime('%a %b %d %H:%M PDT')
-  else:
-    return 'unknown'
 
 
 query = cursor.execute('select * from leaderboard rec order by rec.rank')

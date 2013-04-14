@@ -3,7 +3,7 @@ from collections import defaultdict
 import sys
 
 import marks
-from starcraft import matchups
+from starcraft import make_matchup, matchups
 from tbl import conn, cursor
 import trueskill.trueskill as trueskill
 
@@ -71,7 +71,7 @@ def persist_leaderboard(limit):
     a.wins += 1
     b.losses += 1
 
-    mup = (winner_race + 'v' + loser_race).lower()
+    mup = make_matchup(winner_race, loser_race)
     a.matchups[mup] += 1
     b.matchups[ mup[::-1] ] += 1
 
