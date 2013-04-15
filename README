@@ -1,5 +1,7 @@
 Required Python libraries:
   Cheetah: http://www.cheetahtemplate.org/
+  BeautifulSoup:
+    http://www.crummy.com/software/BeautifulSoup/bs4/doc/#installing-beautiful-soup
 
 
 How to install:
@@ -14,8 +16,8 @@ How to generate a leaderboard from scratch:
   # TODO: Can't currently be run from scratch (needs a seed player).
   python populate.py
 
-  # Using the current contents of the game table (possibly incomplete), generate the leaderboard
-  # table in the database. Clears the old table, if any.
+  # Using the current contents of the game table (possibly incomplete), generate the
+  # leaderboard table in the database. Clears the old table, if any.
   python leaderboard.py
 
   # Generate a pretty HTML leaderboard at "html/leaderboard.html".
