@@ -44,32 +44,37 @@ def get_player_mark():
 
 
 def choose_player(banned):
+  # banned: list of player nicks that aren't eligible (because we had errors on their pages).
+  #
+  # Try to get rankings that are as accurate as possible by ensuring full player history is known
+  # for old games. If every game is understood, then pick a player we think may have played many
+  # games we haven't seen.
+
   player_mark = get_player_mark()
 
   player_pre = defaultdict(lambda: 0)
-  player_post = defaultdict(lambda: 0)
 
   cursor.execute('SELECT id, winner, loser FROM games')
   for game_id, winner, loser in cursor.fetchall():
     for p in [winner, loser]:
-      if game_id > player_mark[p]:
-        player_post[p] += 1
-      else:
-        player_pre[p] += 1
+      if p not in banned:
+        if player_mark[p] < game_id:
+          print 'Player %s: mark %d < game ID %d' % (p, player_mark[p], game_id)
+          return p
+        else:
+          player_pre[p] += 1
 
   max_mark = max( player_mark.values() )
   score_player = []
-  players = set( player_mark.keys() + player_pre.keys() + player_post.keys() )
-  players -= set(banned)
+  players = set( player_pre.keys() )
   for nick in players:
-    score = player_post[nick]
-    if player_mark[nick] > 0:
-      score += ( max_mark - player_mark[nick] ) * player_pre[nick] / float( player_mark[nick] )
+    assert player_mark[nick] > 0
+    score = ( max_mark - player_mark[nick] ) * player_pre[nick] / float( player_mark[nick] )
     score_player.append( (score, nick) )
 
   score, nick = max(score_player)
 
-  print 'Player %s:  pre = %d, post = %d, mark = %d, max_mark = %d, score = %.1f' % (
-    nick, player_pre[nick], player_post[nick], player_mark[nick], max_mark, score)
+  print 'Player %s:  pre = %d, mark = %d, max_mark = %d, score = %.1f' % (
+    nick, player_pre[nick], player_mark[nick], max_mark, score)
 
   return nick
