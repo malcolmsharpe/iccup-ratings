@@ -46,10 +46,21 @@ def process_game(game_id):
   sys.stdout.flush()
 
   url = 'http://www.iccup.com/starcraft/details/%d.html' % game_id
+  html = None
   try:
     lines = iccup.urlopen(url)
-    ret = details.parse( '\n'.join(lines) )
-
+    html = '\n'.join(lines)
+    ret = details.parse(html)
+  except iccup.URLError404:
+    # This game might exist in the future.
+    pass
+  except Exception, e:
+    print 'ERROR: While processing game %d' % game_id
+    print '  description = %s' % e
+    game_errs.add(game_id)
+    if html is not None:
+      file('last_game_error.html', 'w').write(html)
+  else:
     if ret == details.INVALID:
       invalids.invalidate(game_id)
     else:
@@ -58,13 +69,6 @@ def process_game(game_id):
         ret)
       conn.commit()
       return True
-  except iccup.URLError404:
-    # This game might exist in the future.
-    pass
-  except iccup.URLError, e:
-    print 'ERROR: While processing game %d' % game_id
-    print '  description = %s' % e
-    game_errs.add(game_id)
 
   return False
 
