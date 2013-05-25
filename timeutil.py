@@ -1,4 +1,6 @@
-import datetime
+from datetime import datetime
+import time
+
 
 def format_timestamp(timestamp):
   if timestamp is not None:
@@ -11,3 +13,12 @@ def format_timestamp(timestamp):
     return dt.strftime('%a %b %d %H:%M PDT')
   else:
     return 'unknown'
+
+
+YEAR = 2013
+
+
+def parse_date(s):
+  # Sat Mar 23 18:58:01 MSK
+  date = datetime.strptime(s[:-4] + ' ' + str(YEAR), '%a %b %d %H:%M:%S %Y')
+  return int( time.mktime( date.timetuple() ) )

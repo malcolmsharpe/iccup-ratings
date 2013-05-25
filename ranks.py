@@ -1,17 +1,13 @@
 # nick: URL-friendly name
 
 from bs4 import BeautifulSoup
-from datetime import datetime
-import time
 import re
 import sys
 
 from iccup import urlopen
 import letter
 from name_canon import register_name
-
-
-YEAR = 2013
+import timeutil
 
 
 def ptag_to_nick( ptag, pat=re.compile(r'^gamingprofile/(.*)\.html$') ):
@@ -60,8 +56,8 @@ def id_to_match_list(player_id, known_max_game_id):
       maptag, datetag = gtag.find_all('span', 'textleft')
 
       map = maptag.text[5:]
-      date = datetime.strptime(datetag.text[6:-4] + ' ' + str(YEAR), '%a %b %d %H:%M:%S %Y')
-      timestamp = int( time.mktime( date.timetuple() ) )
+      # Date: Sat Mar 23 18:58:01 MSK
+      timestamp = timeutil.parse_date( datetag.text[6:] )
 
       rank_divs = gtag.find_all( 'div', title=re.compile(r'[0-9]+') )
       if len(rank_divs) == 2:
