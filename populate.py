@@ -4,6 +4,7 @@ import sys
 
 import details
 import iccup
+import incremental
 import invalids
 import marks
 from player import nick_to_id 
@@ -74,15 +75,20 @@ def process_game(game_id):
 
 
 def main():
+  mystery_games = True
   while 1:
-    nick = marks.choose_player(player_errs)
+    incremental.one_pass()
 
-    if nick is not None:
-      process_player(nick)
+    if mystery_games:
+      nick = marks.choose_player(player_errs)
+
+      if nick is not None:
+        process_player(nick)
+      else:
+        mystery_games = False
     else:
-      while 1:
-        game_id = invalids.choose_game()
-        if process_game(game_id):
-          break
+      game_id = invalids.choose_game()
+      if process_game(game_id):
+        mystery_games = True
 
 main()
