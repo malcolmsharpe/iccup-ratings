@@ -77,8 +77,6 @@ def process_game(game_id):
 def main():
   mystery_games = True
   while 1:
-    incremental.one_pass()
-
     if mystery_games:
       nick = marks.choose_player(player_errs)
 
