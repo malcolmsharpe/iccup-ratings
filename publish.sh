@@ -1,7 +1,8 @@
 set -e
 set -x
 
-python dump_games_json.py
+# Since we aren't publish the games JSON now, don't generate it.
+#python dump_games_json.py
 cp static/leader.css ../www/static/leader.css
 cp html/leaderboard.html ../www/html/leaderboard.html
 # Disable games dump for now since it's not getting use.

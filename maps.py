@@ -7,7 +7,7 @@ from timeutil import format_timestamp
 
 t = Template(file='templates/maps.html')
 
-cursor.execute('SELECT winner_race, loser_race, map, timestamp FROM games')
+cursor.execute('SELECT winner_race, loser_race, map, timestamp FROM games2')
 
 stats = defaultdict( lambda: defaultdict(lambda: 0) )
 
