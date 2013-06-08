@@ -3,10 +3,11 @@
 
 from collections import defaultdict
 
+from config import CUR_SEASON
 from tbl import conn, cursor
 
 cursor.execute("""
-CREATE TABLE IF NOT EXISTS mark 
+CREATE TABLE IF NOT EXISTS mark
 (nick text primary key, game_id integer)
 """)
 conn.commit()
@@ -18,7 +19,8 @@ def reset(nick):
 
 
 def affirm(nick):
-  game_id = cursor.execute('SELECT MAX(id) FROM games').fetchall()[0][0]
+  cursor.execute( 'SELECT MAX(id) FROM games2 WHERE season = ?', [CUR_SEASON] )
+  game_id = cursor.fetchall()[0][0]
   print 'Affirming player %s mark at %d' % (nick, game_id)
   cursor.execute( 'INSERT OR REPLACE INTO mark VALUES (?, ?)', [nick, game_id] )
   conn.commit()
@@ -51,7 +53,7 @@ def choose_player(banned):
 
   player_mark = get_player_mark()
 
-  cursor.execute('SELECT id, winner, loser FROM games')
+  cursor.execute( 'SELECT id, winner, loser FROM games2 WHERE season = ?', [CUR_SEASON] )
   for game_id, winner, loser in cursor.fetchall():
     for p in [winner, loser]:
       if p not in banned:

@@ -2,6 +2,7 @@ import argparse
 import re
 import sys
 
+from config import CUR_SEASON
 import details
 import iccup
 import incremental
@@ -27,8 +28,8 @@ def process_player(nick):
     matches = ranks.id_to_match_list( current_id, marks.query(nick) )
 
     cursor.executemany(
-      'INSERT OR REPLACE INTO games VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
-      matches)
+      'INSERT OR REPLACE INTO games2 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+      [ [CUR_SEASON] + list(m) for m in matches] )
     conn.commit()
 
     marks.affirm(nick)
@@ -66,8 +67,8 @@ def process_game(game_id):
       invalids.invalidate(game_id)
     else:
       cursor.execute(
-        'INSERT INTO games VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
-        ret)
+        'INSERT INTO games2 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+        [CUR_SEASON] + list(ret) )
       conn.commit()
       return True
 

@@ -52,7 +52,7 @@ def persist_leaderboard(limit):
   sys.stdout.flush()
 
   query = cursor.execute(
-    'SELECT id, winner, loser, winner_race, loser_race, timestamp FROM games ORDER BY id')
+    'SELECT id, winner, loser, winner_race, loser_race, timestamp FROM games2 ORDER BY season, id')
   records = query.fetchall()
 
   print 'Applying trueskill to %d games' % len(records)

@@ -77,7 +77,7 @@ def get_dict():
   # Then use the games table, as recently as possible.
   for (winner, loser, winner_rating, loser_rating, winner_precise, loser_precise,
     winner_diff) in cursor.execute('SELECT winner, loser, winner_rating, loser_rating, '
-      'winner_precise, loser_precise, winner_diff FROM games game ORDER BY game.id'):
+      'winner_precise, loser_precise, winner_diff FROM games2 ORDER BY season, id'):
     if winner_rating is not None:
       raw[winner] = winner_rating
     if loser_rating is not None:

@@ -11,7 +11,7 @@ import trueskill.trueskill as trueskill
 
 cursor.execute("""
 CREATE TABLE IF NOT EXISTS incremental_rating
-(nick text primary key, mu real, sigma real, secure int)
+(nick text primary key, mu real, sigma real, season int, secure int)
 """)
 conn.commit()
 
@@ -19,7 +19,7 @@ conn.commit()
 class Player(object):
   def __init__(self, record):
     self.skill = ( record[0], record[1] )
-    self.secure = record[2]
+    self.secure = (record[2], record[3])
 
 
 def query(nick):
@@ -27,17 +27,17 @@ def query(nick):
   records = cursor.fetchall()
 
   if not records:
-    records.append( (trueskill.INITIAL_MU, trueskill.INITIAL_SIGMA, 0) )
+    records.append( (trueskill.INITIAL_MU, trueskill.INITIAL_SIGMA, 0, 0) )
   record, = records
 
   return Player(record)
 
 
 def put(nick_player):
-  records = [ [nick, player.skill[0], player.skill[1], player.secure]
+  records = [ [ nick, player.skill[0], player.skill[1] ] + list(player.secure)
     for nick, player in nick_player ]
 
-  cursor.executemany( 'INSERT OR REPLACE INTO incremental_rating VALUES (?, ?, ?, ?)', records)
+  cursor.executemany( 'INSERT OR REPLACE INTO incremental_rating VALUES (?, ?, ?, ?, ?)', records)
   conn.commit()
 
 
@@ -50,7 +50,7 @@ def one_pass():
 
   trueskill.SetParameters(draw_probability=0.0)
 
-  cursor.execute('SELECT id, winner, loser FROM games ORDER BY id')
+  cursor.execute('SELECT season, id, winner, loser FROM games ORDER BY season, id')
   records = list( cursor.fetchall() )
 
   player_mark = marks.get_player_mark()
@@ -58,9 +58,9 @@ def one_pass():
 
   num_iter = 0
 
-  for game_id, winner, loser in records:
+  for season, game_id, winner, loser in records:
     if VERBOSE:
-      print 'Considering game %d (%s vs %s)' % (game_id, winner, loser)
+      print 'Considering game (%d, %d) (%s vs %s)' % (season, game_id, winner, loser)
 
     players = [winner, loser]
     if any( map(is_poison, players) ) or winner == loser:
@@ -70,7 +70,7 @@ def one_pass():
 
     eligible = True
     for p in players:
-      if player_mark[p] < game_id or p in incomplete:
+      if player_mark[p] < (season, game_id) or p in incomplete:
         if VERBOSE:
           print '-> game is ineligible (%s had old mark or was incomplete)' % p
         eligible = False
@@ -81,7 +81,7 @@ def one_pass():
       continue
 
     outcome = map(query, players)
-    game_applied = [p.secure >= game_id for p in outcome]
+    game_applied = [p.secure >= (season, game_id) for p in outcome]
 
     if all(game_applied):
       if VERBOSE:
@@ -96,7 +96,7 @@ def one_pass():
 
     nick_player = []
     for nick, p in zip(players, outcome):
-      p.secure = game_id
+      p.secure = (season, game_id)
       nick_player.append( (nick, p) )
     put(nick_player)
 
