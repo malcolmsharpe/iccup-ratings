@@ -12,7 +12,8 @@ def parse_file(f):
 title_pat = re.compile(r'Game Details / ([0-9]+)')
 
 # profile/view/LonelyDay.html
-profile_pat = re.compile(r'^profile/view/(.*).html$')
+# gamingprofile/smokeybear.html
+profile_pat = re.compile(r'^(?:profile/view|gamingprofile)/(.*).html$')
 
 def parse(s):
   soup = BeautifulSoup(s)

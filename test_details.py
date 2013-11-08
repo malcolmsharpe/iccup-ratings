@@ -57,4 +57,8 @@ class TestParseFile(unittest.TestCase):
     ret = details.parse_file('testdata/details_3v3_unranked.html')
     self.assertEqual(ret, details.INVALID)
 
+  def test_nov07(self):
+    ret = details.parse_file('testdata/details_nov17.html')
+    # Just make sure it works for now.
+
 unittest.main()
